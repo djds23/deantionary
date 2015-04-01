@@ -43,19 +43,21 @@ var DefinitionBox = React.createClass({
                 </div>
             );
         } else if ("suggestions" in this.props.data && this.props.data.suggestions !== undefined) {
+            var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
+                index++;
                 return (
-                    <li>
+                    <li key={index} >
                         <a onClick={this.takeSuggestion} >
                             {suggestion}
                         </a>
                     </li>
                 );
             }.bind(this));
-            return (
+            return ( 
                 <div className="btn-group" >
                     <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" >
-                        Try one of these <span class="caret"></span>
+                        Try one of these <span className="caret"></span>
                     </button>
                     <ul className="dropdown-menu" role="menu">
                         {suggestionNodes}
@@ -84,7 +86,7 @@ var DictionaryBox = React.createClass({
         }.bind(this));
     },
     getInitialState: function () {
-        return {};
+        return {word: 'Deantionary', definition: 'A silly dictionary you can use for free'};
     },
     render: function () {
         return (

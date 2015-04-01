@@ -43,19 +43,21 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
                 )
             );
         } else if ("suggestions" in this.props.data && this.props.data.suggestions !== undefined) {
+            var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
+                index++;
                 return (
-                    React.createElement("li", null, 
+                    React.createElement("li", {key: index}, 
                         React.createElement("a", {onClick: this.takeSuggestion}, 
                             suggestion
                         )
                     )
                 );
             }.bind(this));
-            return (
+            return ( 
                 React.createElement("div", {className: "btn-group"}, 
                     React.createElement("button", {type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown"}, 
-                        "Try one of these ", React.createElement("span", {class: "caret"})
+                        "Try one of these ", React.createElement("span", {className: "caret"})
                     ), 
                     React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                         suggestionNodes
@@ -84,7 +86,7 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
         }.bind(this));
     },
     getInitialState: function () {
-        return {};
+        return {word: 'Deantionary', definition: 'A silly dictionary you can use for free'};
     },
     render: function () {
         return (
