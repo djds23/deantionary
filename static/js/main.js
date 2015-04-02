@@ -1,3 +1,5 @@
+React.initializeTouchEvents(true);
+
 var InputForm = React.createClass({displayName: "InputForm",
     handleSubmit: function (e) {
         e.preventDefault();
@@ -34,12 +36,18 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
         if ("definition" in this.props.data && this.props.data.definition !== undefined) {
             return(
                 React.createElement("div", null, 
-                    React.createElement("h6", null, 
-                        this.props.data.word
+                    React.createElement("h5", null, 
+                        this.props.data.word, 
+                        React.createElement("div", {className: "pull-right"}, 
+                            React.createElement("a", {href: $SCRIPT_ROOT + '/?define=' + this.props.data.word}, 
+                                React.createElement("span", {className: "glyphicon glyphicon-link"})
+                            )
+                        )
                     ), 
                     React.createElement("p", null, 
                         this.props.data.definition
                     )
+                    
                 )
             );
         } else if ("suggestions" in this.props.data && this.props.data.suggestions !== undefined) {
