@@ -1,3 +1,6 @@
+'''
+Small script for compiling my JS & Launching the dev server
+'''
 import subprocess
 
 

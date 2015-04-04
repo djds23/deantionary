@@ -17,6 +17,7 @@ def words_view():
     
 @app.route('/define/<word>')
 def define_view(word):
+    word = word.strip()
     lookup = web.define(word)
     if lookup.found:
         return jsonify(

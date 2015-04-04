@@ -32,14 +32,18 @@ var DefinitionBox = React.createClass({
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
     },
+    componentDidMount: function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    },
     render: function () {
+        var correction = this.props.data.correction ? 'Did you mean... ' + this.props.data.word : this.props.data.word
         if ("definition" in this.props.data && this.props.data.definition !== undefined) {
             return(
                 <div>
                     <h5>
-                        {this.props.data.word}
+                        {correction}
                         <div className="pull-right">
-                            <a href={$SCRIPT_ROOT + '/#' + this.props.data.word} >
+                            <a data-toggle="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + this.props.data.word} >
                                 <span className="glyphicon glyphicon-link" />
                             </a>
                         </div>
@@ -85,7 +89,7 @@ var DictionaryBox = React.createClass({
                     word: data.word, 
                     suggestions: data.suggestions, 
                     definition: undefined,
-                    correction: undefined
+                    correction: false
                 }); 
             } else if ("didyoumean" in data){
                 this.setState({
@@ -111,9 +115,7 @@ var DictionaryBox = React.createClass({
     componentDidMount: function () {
         var url_lookup = window.location.hash.slice(1); 
         if (url_lookup !== "") {
-            // Without this we will recursively call render
             this.handleWordLookUp(url_lookup);
-            window.location.hash = "";
         }
     },
     render: function () {

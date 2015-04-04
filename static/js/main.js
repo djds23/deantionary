@@ -32,14 +32,18 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
     },
+    componentDidMount: function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    },
     render: function () {
+        var correction = this.props.data.correction ? 'Did you mean... ' + this.props.data.word : this.props.data.word
         if ("definition" in this.props.data && this.props.data.definition !== undefined) {
             return(
                 React.createElement("div", null, 
                     React.createElement("h5", null, 
-                        this.props.data.word, 
+                        correction, 
                         React.createElement("div", {className: "pull-right"}, 
-                            React.createElement("a", {href: $SCRIPT_ROOT + '/#' + this.props.data.word}, 
+                            React.createElement("a", {"data-toggle": "tooltip", "data-placement": "top", title: "Copy Link", href: $SCRIPT_ROOT + '/#' + this.props.data.word}, 
                                 React.createElement("span", {className: "glyphicon glyphicon-link"})
                             )
                         )
@@ -85,7 +89,7 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
                     word: data.word, 
                     suggestions: data.suggestions, 
                     definition: undefined,
-                    correction: undefined
+                    correction: false
                 }); 
             } else if ("didyoumean" in data){
                 this.setState({
@@ -111,9 +115,7 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
     componentDidMount: function () {
         var url_lookup = window.location.hash.slice(1); 
         if (url_lookup !== "") {
-            // Without this we will recursively call render
             this.handleWordLookUp(url_lookup);
-            window.location.hash = "";
         }
     },
     render: function () {
