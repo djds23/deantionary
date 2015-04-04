@@ -8,6 +8,3 @@ Details about the autocorrect can be found in this article:
 
 http://norvig.com/spell-correct.html 
 
-TODO:
-- Add visual queue that a word has been corrected
-- fix styling around suggest-a-word links
