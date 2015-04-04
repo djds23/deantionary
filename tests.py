@@ -12,21 +12,22 @@ class WebsterTestCase(unittest.TestCase):
         self.web = Webster()
 
     def test_webster_lookup(self):
-        local_def = self.web.define('fun')
+        local_lookup = self.web.define('fun')
         web_resp = self.app.get('/define/fun')
         resp_json_object = json.loads(web_resp.data.decode('utf-8'))
         definition = resp_json_object['definition']
-        self.assertEqual(local_def, definition)
+        self.assertEqual(local_lookup.definition, definition)
 
     def test_suggestions(self):
-        local_suggestions = self.web.define_or_suggest('okad')
-        web_resp = self.app.get('/define/okad')
+        misspelled_word = 'okad'
+        local_lookup = self.web.define(misspelled_word)
+        web_resp = self.app.get('/define/' + misspelled_word)
         resp_json_object = json.loads(web_resp.data.decode('utf-8'))
-        suggestions = resp_json_object['suggestions']
-        self.assertEqual(local_suggestions, suggestions)
-
-
-
+        definition = resp_json_object['definition']
+        didyoumean = resp_json_object['didyoumean']
+        self.assertEqual(local_lookup.word.capitalize(), didyoumean) 
+        self.assertEqual(local_lookup.definition, definition)
+        self.assertEqual(misspelled_word.capitalize(), resp_json_object['word'])
 
 
 if __name__=='__main__':

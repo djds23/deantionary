@@ -39,7 +39,7 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
                     React.createElement("h5", null, 
                         this.props.data.word, 
                         React.createElement("div", {className: "pull-right"}, 
-                            React.createElement("a", {href: $SCRIPT_ROOT + '/?define=' + this.props.data.word}, 
+                            React.createElement("a", {href: $SCRIPT_ROOT + '/#' + this.props.data.word}, 
                                 React.createElement("span", {className: "glyphicon glyphicon-link"})
                             )
                         )
@@ -55,22 +55,16 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
                 index++;
                 return (
-                    React.createElement("li", {key: index}, 
-                        React.createElement("a", {onClick: this.takeSuggestion}, 
-                            suggestion
-                        )
+                    React.createElement("a", {key: index, href: "", onClick: this.takeSuggestion}, 
+                        suggestion, " "
                     )
                 );
             }.bind(this));
             return ( 
-                React.createElement("div", {className: "btn-group"}, 
-                    React.createElement("button", {type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown"}, 
-                        "Try one of these ", React.createElement("span", {className: "caret"})
-                    ), 
-                    React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+                    React.createElement("p", null, 
+                        "Not sure I have that word, but what about one of these: ", 
                         suggestionNodes
                     )
-                )
             );
         } else {
             return (
@@ -87,14 +81,40 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
     handleWordLookUp: function (word) {
         $.get(this.props.url + word).done(function (data) {
             if ("suggestions" in data) {
-                this.setState({word: data.word, suggestions: data.suggestions, definition: undefined}); 
+                this.setState({
+                    word: data.word, 
+                    suggestions: data.suggestions, 
+                    definition: undefined,
+                    correction: undefined
+                }); 
+            } else if ("didyoumean" in data){
+                this.setState({
+                    word: data.didyoumean, 
+                    definition: data.definition, 
+                    suggestions: undefined, 
+                    correction: true
+                });
             } else {
-                this.setState({word: data.word, definition: data.definition, suggestions: undefined});
+                this.setState({
+                    word: data.word, 
+                    definition: data.definition, 
+                    suggestions: undefined, 
+                    correction: false
+                });
             }
+            window.location.hash = '#';
         }.bind(this));
     },
     getInitialState: function () {
-        return {word: 'Deantionary', definition: 'A silly dictionary you can use for free'};
+            return {word: 'Deantionary', definition: 'A silly dictionary you can use for free'};
+    },
+    componentDidMount: function () {
+        var url_lookup = window.location.hash.slice(1); 
+        if (url_lookup !== "") {
+            // Without this we will recursively call render
+            this.handleWordLookUp(url_lookup);
+            window.location.hash = "";
+        }
     },
     render: function () {
         return (

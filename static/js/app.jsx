@@ -39,7 +39,7 @@ var DefinitionBox = React.createClass({
                     <h5>
                         {this.props.data.word}
                         <div className="pull-right">
-                            <a href={$SCRIPT_ROOT + '/?define=' + this.props.data.word} >
+                            <a href={$SCRIPT_ROOT + '/#' + this.props.data.word} >
                                 <span className="glyphicon glyphicon-link" />
                             </a>
                         </div>
@@ -55,22 +55,16 @@ var DefinitionBox = React.createClass({
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
                 index++;
                 return (
-                    <li key={index} >
-                        <a onClick={this.takeSuggestion} >
-                            {suggestion}
-                        </a>
-                    </li>
+                    <a key={index} href="" onClick={this.takeSuggestion} >
+                        {suggestion}&nbsp;
+                    </a>
                 );
             }.bind(this));
             return ( 
-                <div className="btn-group" >
-                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" >
-                        Try one of these <span className="caret"></span>
-                    </button>
-                    <ul className="dropdown-menu" role="menu">
+                    <p>
+                        Not sure I have that word, but what about one of these:&nbsp;
                         {suggestionNodes}
-                    </ul>
-                </div>
+                    </p>
             );
         } else {
             return (
@@ -87,14 +81,40 @@ var DictionaryBox = React.createClass({
     handleWordLookUp: function (word) {
         $.get(this.props.url + word).done(function (data) {
             if ("suggestions" in data) {
-                this.setState({word: data.word, suggestions: data.suggestions, definition: undefined}); 
+                this.setState({
+                    word: data.word, 
+                    suggestions: data.suggestions, 
+                    definition: undefined,
+                    correction: undefined
+                }); 
+            } else if ("didyoumean" in data){
+                this.setState({
+                    word: data.didyoumean, 
+                    definition: data.definition, 
+                    suggestions: undefined, 
+                    correction: true
+                });
             } else {
-                this.setState({word: data.word, definition: data.definition, suggestions: undefined});
+                this.setState({
+                    word: data.word, 
+                    definition: data.definition, 
+                    suggestions: undefined, 
+                    correction: false
+                });
             }
+            window.location.hash = '#';
         }.bind(this));
     },
     getInitialState: function () {
-        return {word: 'Deantionary', definition: 'A silly dictionary you can use for free'};
+            return {word: 'Deantionary', definition: 'A silly dictionary you can use for free'};
+    },
+    componentDidMount: function () {
+        var url_lookup = window.location.hash.slice(1); 
+        if (url_lookup !== "") {
+            // Without this we will recursively call render
+            this.handleWordLookUp(url_lookup);
+            window.location.hash = "";
+        }
     },
     render: function () {
         return (

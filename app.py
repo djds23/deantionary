@@ -17,19 +17,23 @@ def words_view():
     
 @app.route('/define/<word>')
 def define_view(word):
-    definition_or_list = web.define_or_suggest(word)
-    #import pdb; pdb.set_trace()
-    if definition_or_list:
-        if isinstance(definition_or_list, list):
-            return jsonify(
-                word=word.capitalize(), 
-                suggestions=definition_or_list
-            )
-        else:
-            return jsonify(
-                word=word.capitalize(),
-                definition=definition_or_list
-            )
+    lookup = web.define(word)
+    if lookup.found:
+        return jsonify(
+            word=word.capitalize(),
+            definition=lookup.definition
+        )
+    if lookup.word != word:
+        return jsonify(
+            didyoumean=lookup.word.capitalize(),
+            word=word.capitalize(),
+            definition=lookup.definition
+        )
+    else:
+        return jsonify(
+            word=word,
+            suggestions=lookup.suggestions
+        )
     return jsonify(error="not a word, cannot define") 
 
 
