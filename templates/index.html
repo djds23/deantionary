@@ -10,6 +10,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
         <script type="text/javascript">
             $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
         </script>
@@ -23,6 +24,11 @@
         <div class="container"> 
             <div id="content" class="jumbotron"></div>
         </div>
+        <footer class="footer">
+            <div class="container">
+                <p class="text-muted px-margin-20">Created by <a href="https://github.com/djds23">Dean Silfen</a> </p>
+            </div>
+        </footer>
         <script src="{{ url_for('static', filename='js/react.js') }}"></script>
         <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     </body>
