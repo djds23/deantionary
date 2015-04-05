@@ -36,7 +36,7 @@ var DefinitionBox = React.createClass({
         $('[data-toggle="tooltip"]').tooltip();
     },
     render: function () {
-        var correction = this.props.data.correction ? 'Did you mean... ' + this.props.data.word : this.props.data.word
+        var correction = !this.props.data.found ? 'Did you mean... ' + this.props.data.word : this.props.data.word
         if (this.props.data.definition !== null) {
             return(
                 <div>
@@ -97,7 +97,7 @@ var DictionaryBox = React.createClass({
         return {
             word: 'Deantionary', 
             definition: 'A silly dictionary you can use for free',
-            correction: false,
+            found: true,
             suggestions: []
         };
     },

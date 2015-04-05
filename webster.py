@@ -82,17 +82,17 @@ class Webster(object):
         word = word.lower()
         definition = self.cached_get(word)
         if definition:
-            return LookUp(True, word, definition, None)
+            return LookUp(True, word.capitalize(), definition, None)
 
         correction = self.spell_checker.correct(word)
         if correction == word:
-            return LookUp(False, word, None, self.find_similar(word))
+            return LookUp(False, word.capitalize(), None, self.find_similar(word))
 
         corrected_definition = self.cached_get(correction)  
         if corrected_definition:
-            return LookUp(False, correction, corrected_definition, None) 
+            return LookUp(False, correction.capitalize(), corrected_definition, None) 
 
-        return LookUp(False, word, None, self.find_similar(word))
+        return LookUp(False, word.capitalize(), None, self.find_similar(word))
         
     def find_similar(self, word):
         partial_word = ''

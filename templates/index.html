@@ -14,8 +14,6 @@
         <script type="text/javascript">
             $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
         </script>
-        <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='js/jquery.js') }}"><\/script>')</script>
-        <script src="{{ url_for('static', filename='js/bootstrap.js') }}" > </script>
     </head>
     <body>
         <!--[if lt IE 8]>
@@ -29,6 +27,8 @@
                 <p class="text-muted px-margin-20">Created by <a href="https://github.com/djds23">Dean Silfen</a> </p>
             </div>
         </footer>
+        <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='js/jquery.js') }}"><\/script>')</script>
+        <script src="{{ url_for('static', filename='js/bootstrap.js') }}" > </script>
         <script src="{{ url_for('static', filename='js/react.js') }}"></script>
         <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     </body>
