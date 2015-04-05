@@ -37,7 +37,7 @@ var DefinitionBox = React.createClass({
     },
     render: function () {
         var correction = this.props.data.correction ? 'Did you mean... ' + this.props.data.word : this.props.data.word
-        if ("definition" in this.props.data && this.props.data.definition !== undefined) {
+        if (this.props.data.definition !== null) {
             return(
                 <div>
                     <h5>
@@ -54,7 +54,7 @@ var DefinitionBox = React.createClass({
                     
                 </div>
             );
-        } else if ("suggestions" in this.props.data && this.props.data.suggestions !== undefined) {
+        } else if (this.props.data.suggestions.length !== 0) {
             var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
                 index++;
@@ -73,7 +73,7 @@ var DefinitionBox = React.createClass({
         } else {
             return (
                 <h2>
-                    I do not know what that means!
+                    I do not know what {this.props.data.word} means!
                 </h2>
             );
         }
@@ -84,33 +84,22 @@ var DefinitionBox = React.createClass({
 var DictionaryBox = React.createClass({
     handleWordLookUp: function (word) {
         $.get(this.props.url + word).done(function (data) {
-            if ("suggestions" in data) {
-                this.setState({
-                    word: data.word, 
-                    suggestions: data.suggestions, 
-                    definition: undefined,
-                    correction: false
-                }); 
-            } else if ("didyoumean" in data){
-                this.setState({
-                    word: data.didyoumean, 
-                    definition: data.definition, 
-                    suggestions: undefined, 
-                    correction: true
-                });
-            } else {
-                this.setState({
-                    word: data.word, 
-                    definition: data.definition, 
-                    suggestions: undefined, 
-                    correction: false
-                });
-            }
+            this.setState({
+                word: data.word, 
+                definition: data.definition,
+                suggestions: data.suggestions,
+                found: data.found
+            }); 
             window.location.hash = '#';
         }.bind(this));
     },
     getInitialState: function () {
-            return {word: 'Deantionary', definition: 'A silly dictionary you can use for free'};
+        return {
+            word: 'Deantionary', 
+            definition: 'A silly dictionary you can use for free',
+            correction: false,
+            suggestions: []
+        };
     },
     componentDidMount: function () {
         var url_lookup = window.location.hash.slice(1); 

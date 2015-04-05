@@ -19,23 +19,12 @@ def words_view():
 def define_view(word):
     word = word.strip()
     lookup = web.define(word)
-    if lookup.found:
-        return jsonify(
-            word=word.capitalize(),
-            definition=lookup.definition
-        )
-    if lookup.word != word:
-        return jsonify(
-            didyoumean=lookup.word.capitalize(),
-            word=word.capitalize(),
-            definition=lookup.definition
-        )
-    else:
-        return jsonify(
-            word=word,
-            suggestions=lookup.suggestions
-        )
-    return jsonify(error="not a word, cannot define") 
+    return jsonify(
+        word=lookup.word, 
+        definition=lookup.definition,
+        suggestions=lookup.suggestions,
+        found=lookup.found
+    )
 
 
 if __name__=='__main__':
