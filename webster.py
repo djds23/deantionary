@@ -34,6 +34,16 @@ class SpellChecker(object):
         candidates = (self._known([word]) or self._known(self._check1(word))
                 or self._known_edits2(word) or [word])
         return max(candidates, key=self.model.get)
+    
+    def possible_corrections(word):
+        candidates = (self._known([word]) or self._known(self._check1(word))
+                or self._known_edits2(word) or [word])
+        words = []
+        while candidates:
+            possible_word = max(candidates, key=self.model.get)
+            words.append(possible_word)
+            candidates.remove(possible_word)
+        return words
 
 
 class Webster(object):
@@ -84,7 +94,7 @@ class Webster(object):
         if definition:
             return LookUp(True, word.capitalize(), definition, None)
 
-        correction = self.spell_checker.correct(word)
+        correction = self.spell_checker.correct(word, return_multiple=True)
         if correction == word:
             return LookUp(False, word.capitalize(), None, self.find_similar(word))
 
