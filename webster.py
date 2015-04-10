@@ -35,7 +35,7 @@ class SpellChecker(object):
                 or self._known_edits2(word) or [word])
         return max(candidates, key=self.model.get)
     
-    def possible_corrections(word):
+    def possible_corrections(self, word):
         candidates = (self._known([word]) or self._known(self._check1(word))
                 or self._known_edits2(word) or [word])
         words = []
@@ -63,6 +63,12 @@ class Webster(object):
             )
         ) 
         self.spell_checker = spell_checker
+        self.LookUp = collections.namedtuple('LookUp', [
+            'found',
+            'word',
+            'definition',
+            'suggestions'
+        ])
 
     def random_word(self, include_def=False):
         word =  random.choice(self._keys)
@@ -80,31 +86,64 @@ class Webster(object):
     def cached_get(self, word):
         return self.english.get(word)
 
+    @lru_cache(maxsize=128)
+    def cached_haskey(self, word):
+        return self.english.haskey(word)
+
     @lru_cache()
     def define(self, word):
-        LookUp = collections.namedtuple('LookUp', [
-            'found',
-            'word',
-            'definition',
-            'suggestions'
-        ])
-
         word = word.lower()
         definition = self.cached_get(word)
         if definition:
-            return LookUp(True, word.capitalize(), definition, None)
+            return self.LookUp(
+                found=True, 
+                word=word.capitalize(), 
+                definition=definition, 
+                suggestions=None
+            )
 
-        correction = self.spell_checker.correct(word, return_multiple=True)
+        correction = self.spell_checker.correct(word)
         if correction == word:
-            return LookUp(False, word.capitalize(), None, self.find_similar(word))
+            return self.LookUp(
+                found=False, 
+                word=word.capitalize(), 
+                definition=None, 
+                suggestions=self.find_similar(word)
+            )
 
-        corrected_definition = self.cached_get(correction)  
+        corrected_definition = False #self.cached_get(correction)  
         if corrected_definition:
-            return LookUp(False, correction.capitalize(), corrected_definition, None) 
+            return self.LookUp(
+                found=False, 
+                word=correction.capitalize(), 
+                definition=corrected_definition, 
+                suggestions=None
+            ) 
 
-        return LookUp(False, word.capitalize(), None, self.find_similar(word))
+
+        return self.LookUp(
+            found=False, 
+            word=word.capitalize(), 
+            definition=None, 
+            suggestions=self.find_similar(word)
+        )
         
     def find_similar(self, word):
+        word_list = []
+        possible_similarities = self.spell_checker.possible_corrections(word)
+        for word in possible_similarities:
+            definition = self.cached_get(word)
+            if definition:
+                word_list.append(self.LookUp(
+                    found=False,
+                    word=word.capitalize(),
+                    definition=definition,
+                    suggestions=[]
+                ))
+        return word_list
+
+
+    def find_same_startswith(self, word):
         partial_word = ''
         for i in range(len(word)):
             partial_word += word[i]

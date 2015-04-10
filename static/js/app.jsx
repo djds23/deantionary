@@ -32,41 +32,45 @@ var DefinitionBox = React.createClass({
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
     },
-    componentDidMount: function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    },
-    render: function () {
-        var correction = !this.props.data.found ? 'Did you mean... ' + this.props.data.word : this.props.data.word
-        if (this.props.data.definition !== null) {
-            return(
+    constructWordDefinition: function (LookUpObject, index) {
+        var correction = !LookUpObject.found ? 'Did you mean... ' + LookUpObject.word : LookUpObject.word
+        return (
                 <div>
                     <h5>
                         {correction}
                         <div className="pull-right">
-                            <a data-toggle="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + this.props.data.word} >
+                            <a data-togglr="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + LookUpObject.word}>
                                 <span className="glyphicon glyphicon-link" />
                             </a>
                         </div>
                     </h5>
                     <p> 
-                        {this.props.data.definition}
+                        {LookUpObject.definition}
                     </p>
-                    
                 </div>
-            );
+        );
+    },
+    componentDidMount: function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    },
+    render: function () {
+        if (this.props.data.definition !== null) {
+            return this.constructWordDefinition(this.props.data, null);        
         } else if (this.props.data.suggestions.length !== 0) {
             var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
+            var suggestionElement = this.constructWordDefinition(suggestion); 
                 index++;
                 return (
-                    <a key={index} href="" onClick={this.takeSuggestion} >
-                        {suggestion}&nbsp;
-                    </a>
+                    <div key={index} >
+                        {suggestionElement}
+                    </div>
                 );
             }.bind(this));
             return ( 
                     <p>
                         Not sure I have that word, but what about one of these:&nbsp;
+                        <br />
                         {suggestionNodes}
                     </p>
             );

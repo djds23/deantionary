@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 
 from webster import Webster
+from utils import jsonify_namedtuple 
 
 
 app = Flask(__name__)
@@ -19,6 +20,9 @@ def words_view():
 def define_view(word):
     word = word.strip()
     lookup = web.define(word)
+    test= jsonify_namedtuple(lookup)
+    import pdb; pdb.set_trace()
+    var = 1
     return jsonify(
         word=lookup.word, 
         definition=lookup.definition,
