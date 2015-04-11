@@ -27,47 +27,54 @@ var InputForm = React.createClass({
     }
 });
 
+var WordDefinition = React.createClass({
+    render: function () {
+        return (
+                <div>
+                    <a data-togglr="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + this.props.LookUpObject.word}>
+                        <h5>
+                            {this.props.LookUpObject.word}
+                        </h5>
+                    </a>
+                    <p> 
+                        {this.props.LookUpObject.definition}
+                    </p>
+                </div>
+        );
+    }
+});
+
 var DefinitionBox = React.createClass({
     takeSuggestion: function (e) {
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
-    },
-    constructWordDefinition: function (LookUpObject) {
-        var correction = !LookUpObject.found ? 'Did you mean... ' + LookUpObject.word : LookUpObject.word
-        return (
-                <div>
-                    <h5>
-                        {correction}
-                        <div className="pull-right">
-                            <a data-togglr="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + LookUpObject.word}>
-                                <span className="glyphicon glyphicon-link" />
-                            </a>
-                        </div>
-                    </h5>
-                    <p> 
-                        {LookUpObject.definition}
-                    </p>
-                </div>
-        );
     },
     componentDidMount: function () {
         $('[data-toggle="tooltip"]').tooltip();
     },
     render: function () {
         if (this.props.data.definition !== null) {
-            return this.constructWordDefinition(this.props.data);        
+            return (
+                <WordDefinition LookUpObject={this.props.data} />
+            );        
         } else if (this.props.data.suggestions.length !== 0) {
             var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
-            var suggestionElement = this.constructWordDefinition(suggestion); 
                 index++;
                 return (
                     <div key={index} >
-                        {suggestionElement}
+                        <WordDefinition LookUpObject={suggestion} />
                     </div>
                 );
             }.bind(this));
-            return suggestionNodes;
+            return (
+                <div>
+                    <p className="padding" >
+                        I do not have that word, but maybe you meant... 
+                    </p>
+                    {suggestionNodes}
+                </div>
+            );
         } else {
             return (
                 <h2>
