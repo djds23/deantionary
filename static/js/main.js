@@ -32,7 +32,7 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
     },
-    constructWordDefinition: function (LookUpObject, index) {
+    constructWordDefinition: function (LookUpObject) {
         var correction = !LookUpObject.found ? 'Did you mean... ' + LookUpObject.word : LookUpObject.word
         return (
                 React.createElement("div", null, 
@@ -55,7 +55,7 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
     },
     render: function () {
         if (this.props.data.definition !== null) {
-            return this.constructWordDefinition(this.props.data, null);        
+            return this.constructWordDefinition(this.props.data);        
         } else if (this.props.data.suggestions.length !== 0) {
             var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
@@ -67,13 +67,8 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
                     )
                 );
             }.bind(this));
-            return ( 
-                    React.createElement("p", null, 
-                        "Not sure I have that word, but what about one of these: ", 
-                        React.createElement("br", null), 
-                        suggestionNodes
-                    )
-            );
+            var d = 'k';
+            return suggestionNodes;
         } else {
             return (
                 React.createElement("h2", null, 
@@ -94,7 +89,6 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
                 suggestions: data.suggestions,
                 found: data.found
             }); 
-            window.location.hash = '#';
         }.bind(this));
     },
     getInitialState: function () {
@@ -107,7 +101,7 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
     },
     componentDidMount: function () {
         var url_lookup = window.location.hash.slice(1); 
-        if (url_lookup !== "") {
+        if (url_lookup !== "" && this.state.word !== url_lookup) {
             this.handleWordLookUp(url_lookup);
         }
     },

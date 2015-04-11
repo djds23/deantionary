@@ -32,7 +32,7 @@ var DefinitionBox = React.createClass({
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
     },
-    constructWordDefinition: function (LookUpObject, index) {
+    constructWordDefinition: function (LookUpObject) {
         var correction = !LookUpObject.found ? 'Did you mean... ' + LookUpObject.word : LookUpObject.word
         return (
                 <div>
@@ -55,7 +55,7 @@ var DefinitionBox = React.createClass({
     },
     render: function () {
         if (this.props.data.definition !== null) {
-            return this.constructWordDefinition(this.props.data, null);        
+            return this.constructWordDefinition(this.props.data);        
         } else if (this.props.data.suggestions.length !== 0) {
             var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
@@ -67,13 +67,7 @@ var DefinitionBox = React.createClass({
                     </div>
                 );
             }.bind(this));
-            return ( 
-                    <p>
-                        Not sure I have that word, but what about one of these:&nbsp;
-                        <br />
-                        {suggestionNodes}
-                    </p>
-            );
+            return suggestionNodes;
         } else {
             return (
                 <h2>
@@ -94,7 +88,6 @@ var DictionaryBox = React.createClass({
                 suggestions: data.suggestions,
                 found: data.found
             }); 
-            window.location.hash = '#';
         }.bind(this));
     },
     getInitialState: function () {
@@ -107,7 +100,7 @@ var DictionaryBox = React.createClass({
     },
     componentDidMount: function () {
         var url_lookup = window.location.hash.slice(1); 
-        if (url_lookup !== "") {
+        if (url_lookup !== "" && this.state.word !== url_lookup) {
             this.handleWordLookUp(url_lookup);
         }
     },
