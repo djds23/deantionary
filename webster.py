@@ -2,6 +2,7 @@ import collections
 import json
 import random
 import string
+from collections.abc import Iterator, Mapping
 from functools import lru_cache
 from itertools import chain
 
@@ -45,6 +46,25 @@ class SpellChecker(object):
             candidates.remove(possible_word)
         return words
 
+BaseLookUp = collections.namedtuple('LookUp', [
+    'found',
+    'word',
+    'definition',
+    'suggestions'
+])
+
+class LookUp(BaseLookUp):
+    """ currently not working, for some reason subclassing BaseLookUp breaks 
+    `._asdict`
+    """
+    def serialize(self, return_dict=None):
+        from utils import serialize_namedtuple
+        return serialize_namedtuple(self) 
+
+    def _asdict(self):
+        """Need to reimplement this for subclasses of namedtuple objects"""
+        return dict(zip(self._fields, self))
+    
 
 class Webster(object):
     # ensure words are lowercase
@@ -63,12 +83,6 @@ class Webster(object):
             )
         ) 
         self.spell_checker = spell_checker
-        self.LookUp = collections.namedtuple('LookUp', [
-            'found',
-            'word',
-            'definition',
-            'suggestions'
-        ])
 
     def random_word(self, include_def=False):
         word =  random.choice(self._keys)
@@ -95,7 +109,7 @@ class Webster(object):
         word = word.lower()
         definition = self.cached_get(word)
         if definition:
-            return self.LookUp(
+            return LookUp(
                 found=True, 
                 word=word.capitalize(), 
                 definition=definition, 
@@ -104,7 +118,7 @@ class Webster(object):
 
         correction = self.spell_checker.correct(word)
         if correction == word:
-            return self.LookUp(
+            return LookUp(
                 found=False, 
                 word=word.capitalize(), 
                 definition=None, 
@@ -113,7 +127,7 @@ class Webster(object):
 
         corrected_definition = False #self.cached_get(correction)  
         if corrected_definition:
-            return self.LookUp(
+            return LookUp(
                 found=False, 
                 word=correction.capitalize(), 
                 definition=corrected_definition, 
@@ -121,7 +135,7 @@ class Webster(object):
             ) 
 
 
-        return self.LookUp(
+        return LookUp(
             found=False, 
             word=word.capitalize(), 
             definition=None, 
@@ -134,7 +148,7 @@ class Webster(object):
         for word in possible_similarities:
             definition = self.cached_get(word)
             if definition:
-                word_list.append(self.LookUp(
+                word_list.append(LookUp(
                     found=False,
                     word=word.capitalize(),
                     definition=definition,
