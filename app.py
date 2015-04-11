@@ -2,7 +2,6 @@ from flask import Flask, jsonify, render_template, request
 
 from webster import Webster
 
-
 app = Flask(__name__)
 web = Webster()
 
@@ -19,12 +18,7 @@ def words_view():
 def define_view(word):
     word = word.strip()
     lookup = web.define(word)
-    return jsonify(
-        word=lookup.word, 
-        definition=lookup.definition,
-        suggestions=lookup.suggestions,
-        found=lookup.found
-    )
+    return jsonify(**lookup.serialize())
 
 
 if __name__=='__main__':

@@ -27,6 +27,23 @@ var InputForm = React.createClass({
     }
 });
 
+var WordDefinition = React.createClass({
+    render: function () {
+        return (
+                <div>
+                    <a data-togglr="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + this.props.LookUpObject.word}>
+                        <h5>
+                            {this.props.LookUpObject.word}
+                        </h5>
+                    </a>
+                    <p> 
+                        {this.props.LookUpObject.definition}
+                    </p>
+                </div>
+        );
+    }
+});
+
 var DefinitionBox = React.createClass({
     takeSuggestion: function (e) {
         e.preventDefault();
@@ -36,39 +53,27 @@ var DefinitionBox = React.createClass({
         $('[data-toggle="tooltip"]').tooltip();
     },
     render: function () {
-        var correction = !this.props.data.found ? 'Did you mean... ' + this.props.data.word : this.props.data.word
         if (this.props.data.definition !== null) {
-            return(
-                <div>
-                    <h5>
-                        {correction}
-                        <div className="pull-right">
-                            <a data-toggle="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + this.props.data.word} >
-                                <span className="glyphicon glyphicon-link" />
-                            </a>
-                        </div>
-                    </h5>
-                    <p> 
-                        {this.props.data.definition}
-                    </p>
-                    
-                </div>
-            );
+            return (
+                <WordDefinition LookUpObject={this.props.data} />
+            );        
         } else if (this.props.data.suggestions.length !== 0) {
             var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
                 index++;
                 return (
-                    <a key={index} href="" onClick={this.takeSuggestion} >
-                        {suggestion}&nbsp;
-                    </a>
+                    <div key={index} >
+                        <WordDefinition LookUpObject={suggestion} />
+                    </div>
                 );
             }.bind(this));
-            return ( 
-                    <p>
-                        Not sure I have that word, but what about one of these:&nbsp;
-                        {suggestionNodes}
+            return (
+                <div>
+                    <p className="padding" >
+                        I do not have that word, but maybe you meant... 
                     </p>
+                    {suggestionNodes}
+                </div>
             );
         } else {
             return (
@@ -90,7 +95,6 @@ var DictionaryBox = React.createClass({
                 suggestions: data.suggestions,
                 found: data.found
             }); 
-            window.location.hash = '#';
         }.bind(this));
     },
     getInitialState: function () {
@@ -103,7 +107,7 @@ var DictionaryBox = React.createClass({
     },
     componentDidMount: function () {
         var url_lookup = window.location.hash.slice(1); 
-        if (url_lookup !== "") {
+        if (url_lookup !== "" && this.state.word !== url_lookup) {
             this.handleWordLookUp(url_lookup);
         }
     },

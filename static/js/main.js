@@ -27,6 +27,23 @@ var InputForm = React.createClass({displayName: "InputForm",
     }
 });
 
+var WordDefinition = React.createClass({displayName: "WordDefinition",
+    render: function () {
+        return (
+                React.createElement("div", null, 
+                    React.createElement("a", {"data-togglr": "tooltip", "data-placement": "top", title: "Copy Link", href: $SCRIPT_ROOT + '/#' + this.props.LookUpObject.word}, 
+                        React.createElement("h5", null, 
+                            this.props.LookUpObject.word
+                        )
+                    ), 
+                    React.createElement("p", null, 
+                        this.props.LookUpObject.definition
+                    )
+                )
+        );
+    }
+});
+
 var DefinitionBox = React.createClass({displayName: "DefinitionBox",
     takeSuggestion: function (e) {
         e.preventDefault();
@@ -36,39 +53,27 @@ var DefinitionBox = React.createClass({displayName: "DefinitionBox",
         $('[data-toggle="tooltip"]').tooltip();
     },
     render: function () {
-        var correction = !this.props.data.found ? 'Did you mean... ' + this.props.data.word : this.props.data.word
         if (this.props.data.definition !== null) {
-            return(
-                React.createElement("div", null, 
-                    React.createElement("h5", null, 
-                        correction, 
-                        React.createElement("div", {className: "pull-right"}, 
-                            React.createElement("a", {"data-toggle": "tooltip", "data-placement": "top", title: "Copy Link", href: $SCRIPT_ROOT + '/#' + this.props.data.word}, 
-                                React.createElement("span", {className: "glyphicon glyphicon-link"})
-                            )
-                        )
-                    ), 
-                    React.createElement("p", null, 
-                        this.props.data.definition
-                    )
-                    
-                )
-            );
+            return (
+                React.createElement(WordDefinition, {LookUpObject: this.props.data})
+            );        
         } else if (this.props.data.suggestions.length !== 0) {
             var index = 0;
             var suggestionNodes = this.props.data.suggestions.map(function (suggestion) {
                 index++;
                 return (
-                    React.createElement("a", {key: index, href: "", onClick: this.takeSuggestion}, 
-                        suggestion, " "
+                    React.createElement("div", {key: index}, 
+                        React.createElement(WordDefinition, {LookUpObject: suggestion})
                     )
                 );
             }.bind(this));
-            return ( 
-                    React.createElement("p", null, 
-                        "Not sure I have that word, but what about one of these: ", 
-                        suggestionNodes
-                    )
+            return (
+                React.createElement("div", null, 
+                    React.createElement("p", {className: "padding"}, 
+                        "I do not have that word, but maybe you meant..." 
+                    ), 
+                    suggestionNodes
+                )
             );
         } else {
             return (
@@ -90,7 +95,6 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
                 suggestions: data.suggestions,
                 found: data.found
             }); 
-            window.location.hash = '#';
         }.bind(this));
     },
     getInitialState: function () {
@@ -103,7 +107,7 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
     },
     componentDidMount: function () {
         var url_lookup = window.location.hash.slice(1); 
-        if (url_lookup !== "") {
+        if (url_lookup !== "" && this.state.word !== url_lookup) {
             this.handleWordLookUp(url_lookup);
         }
     },

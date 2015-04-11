@@ -1,9 +1,10 @@
+from collections import namedtuple
 import unittest
 import json
 
+from utils import serialize_namedtuple
 from app import app
-from webster import Webster
-
+from webster import Webster 
 
 class WebsterTestCase(unittest.TestCase):
 
@@ -29,5 +30,29 @@ class WebsterTestCase(unittest.TestCase):
         self.assertEqual(local_lookup.definition, definition)
 
 
+class LookUpTestCase(unittest.TestCase):
+
+    def test_dict_serialize_namedtuple(self):
+        return_value = {
+                'name': 'test',
+                'inner_vals': 
+                [{
+                    'name': 'test',
+                    'inner_vals': []
+                    }]}
+        Test = namedtuple('Test', ['name', 'inner_vals'])
+        nt_for_serialization = Test(
+            name='test',
+            inner_vals= [
+                Test(
+                    name='test',
+                    inner_vals=[]
+                )
+            ]
+        )
+        test_rv = serialize_namedtuple(nt_for_serialization)
+        self.assertEqual(test_rv, return_value)
+
+        
 if __name__=='__main__':
     unittest.main()
