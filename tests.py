@@ -25,10 +25,9 @@ class WebsterTestCase(unittest.TestCase):
         web_resp = self.app.get('/define/' + misspelled_word)
         resp_json_object = json.loads(web_resp.data.decode('utf-8'))
         definition = resp_json_object['definition']
-        didyoumean = resp_json_object['word']
-        self.assertEqual(local_lookup.word.capitalize(), didyoumean) 
+        word = resp_json_object['word']
+        self.assertEqual(local_lookup.word.capitalize(), word) 
         self.assertEqual(local_lookup.definition, definition)
-        self.assertEqual(misspelled_word.capitalize(), resp_json_object['word'])
 
 
 class LookUpTestCase(unittest.TestCase):
