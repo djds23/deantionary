@@ -47,7 +47,6 @@ class SpellChecker(object):
         return words
 
 BaseLookUp = collections.namedtuple('LookUp', [
-    'found',
     'word',
     'definition',
     'suggestions'
@@ -63,6 +62,7 @@ class LookUp(BaseLookUp):
 
     def _asdict(self):
         """Need to reimplement this for subclasses of namedtuple objects"""
+        # TODO: investigate this or file bug
         return dict(zip(self._fields, self))
     
 
@@ -102,7 +102,7 @@ class Webster(object):
 
     @lru_cache(maxsize=128)
     def cached_haskey(self, word):
-        return self.english.haskey(word)
+        return word in self.english.keys()
 
     @lru_cache()
     def define(self, word):
@@ -110,33 +110,11 @@ class Webster(object):
         definition = self.cached_get(word)
         if definition:
             return LookUp(
-                found=True, 
                 word=word.capitalize(), 
                 definition=definition, 
                 suggestions=None
             )
-
-        correction = self.spell_checker.correct(word)
-        if correction == word:
-            return LookUp(
-                found=False, 
-                word=word.capitalize(), 
-                definition=None, 
-                suggestions=self.find_similar(word)
-            )
-
-        corrected_definition = False #self.cached_get(correction)  
-        if corrected_definition:
-            return LookUp(
-                found=False, 
-                word=correction.capitalize(), 
-                definition=corrected_definition, 
-                suggestions=None
-            ) 
-
-
         return LookUp(
-            found=False, 
             word=word.capitalize(), 
             definition=None, 
             suggestions=self.find_similar(word)
@@ -149,7 +127,16 @@ class Webster(object):
             definition = self.cached_get(word)
             if definition:
                 word_list.append(LookUp(
-                    found=False,
+                    word=word.capitalize(),
+                    definition=definition,
+                    suggestions=[]
+                ))
+        if word_list:
+            return word_list
+        for word in self.find_same_startswith(word):
+            definition = self.cached_get(word)
+            if definition:
+                word_list.append(LookUp(
                     word=word.capitalize(),
                     definition=definition,
                     suggestions=[]
@@ -158,16 +145,34 @@ class Webster(object):
 
 
     def find_same_startswith(self, word):
+        def sort_defined_words(word):
+            '''return word frequency score'''
+            return self.spell_checker.model.get(word)
         partial_word = ''
         for i in range(len(word)):
             partial_word += word[i]
             word_list = list(
                 filter(
                     lambda key: key.startswith(partial_word.lower()),
-                    self._keys
+                    self.spell_checker.model.keys()
+                )
+            )
+
+            filtered_word_list = list(
+                filter(
+                    lambda key: self.cached_haskey(key),
+                    word_list
                 )
             )
             if len(word_list) <= 50:
-                return word_list[0:5]
+                sorted_word_list = list(
+                    sorted(
+                        filtered_word_list, 
+                        key=sort_defined_words       
+                    )
+                )
+                return sorted_word_list[0:20]
+            empty_word_list = []
+            return empty_word_list
         return word_list
 

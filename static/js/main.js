@@ -93,7 +93,6 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
                 word: data.word, 
                 definition: data.definition,
                 suggestions: data.suggestions,
-                found: data.found
             }); 
         }.bind(this));
     },
@@ -101,7 +100,6 @@ var DictionaryBox = React.createClass({displayName: "DictionaryBox",
         return {
             word: 'Deantionary', 
             definition: 'A silly dictionary you can use for free',
-            found: true,
             suggestions: []
         };
     },
