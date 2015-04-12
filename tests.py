@@ -1,10 +1,11 @@
 from collections import namedtuple
-import unittest
 import json
+import unittest
 
-from utils import serialize_namedtuple
 from app import app
-from webster import Webster 
+from utils import serialize_namedtuple
+from webster import Webster, LookUp 
+
 
 class WebsterTestCase(unittest.TestCase):
 
@@ -19,7 +20,7 @@ class WebsterTestCase(unittest.TestCase):
         definition = resp_json_object['definition']
         self.assertEqual(local_lookup.definition, definition)
 
-    def test_suggestions(self):
+    def test_define_spellchecker_suggest(self):
         misspelled_word = 'okad'
         local_lookup = self.web.define(misspelled_word)
         web_resp = self.app.get('/define/' + misspelled_word)
@@ -29,6 +30,15 @@ class WebsterTestCase(unittest.TestCase):
         self.assertEqual(local_lookup.word.capitalize(), word) 
         self.assertEqual(local_lookup.definition, definition)
 
+    def test_define_startswith_suggest(self):
+        test_word = 'dean'
+        local_lookup = self.web.define(test_word)
+        local_serialized_lookup = local_lookup.serialize()
+        local_suggestions = local_serialized_lookup['suggestions']
+        web_resp = self.app.get('/define/' + test_word)
+        resp_json_object = json.loads(web_resp.data.decode('utf-8'))
+        suggestions = resp_json_object['suggestions']
+        self.assertEqual(local_suggestions, suggestions)
 
 class LookUpTestCase(unittest.TestCase):
 

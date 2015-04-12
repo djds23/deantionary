@@ -46,6 +46,7 @@ class SpellChecker(object):
             candidates.remove(possible_word)
         return words
 
+
 BaseLookUp = collections.namedtuple('LookUp', [
     'word',
     'definition',
@@ -62,9 +63,9 @@ class LookUp(BaseLookUp):
 
     def _asdict(self):
         """Need to reimplement this for subclasses of namedtuple objects"""
-        # TODO: investigate this or file bug
+        # TODO: investigate this or file bug in Python3
         return dict(zip(self._fields, self))
-    
+
 
 class Webster(object):
     # ensure words are lowercase
@@ -83,25 +84,13 @@ class Webster(object):
             )
         ) 
         self.spell_checker = spell_checker
-
-    def random_word(self, include_def=False):
-        word =  random.choice(self._keys)
-        if include_def:
-            return word, self.english[word]
-        return word
-
-    def random_words(self, num, include_def=False):
-        words = []
-        for _ in range(num):
-            words.append(self.random_word(include_def))
-        return tuple(words)
-
+    
     @lru_cache(maxsize=128)
     def cached_get(self, word):
         return self.english.get(word)
 
     @lru_cache(maxsize=128)
-    def cached_haskey(self, word):
+    def cached_has_key(self, word):
         return word in self.english.keys()
 
     @lru_cache()
@@ -114,10 +103,12 @@ class Webster(object):
                 definition=definition, 
                 suggestions=None
             )
+
+        suggestions=self.find_similar(word)
         return LookUp(
             word=word.capitalize(), 
             definition=None, 
-            suggestions=self.find_similar(word)
+            suggestions=suggestions
         )
         
     def find_similar(self, word):
@@ -143,36 +134,37 @@ class Webster(object):
                 ))
         return word_list
 
-
     def find_same_startswith(self, word):
+
         def sort_defined_words(word):
             '''return word frequency score'''
             return self.spell_checker.model.get(word)
+
+        word_list = None
         partial_word = ''
         for i in range(len(word)):
             partial_word += word[i]
+            word_list = self.spell_checker.model.keys() if not word_list else word_list
             word_list = list(
                 filter(
                     lambda key: key.startswith(partial_word.lower()),
-                    self.spell_checker.model.keys()
+                    word_list
                 )
             )
-
-            filtered_word_list = list(
+            word_list = list(
                 filter(
-                    lambda key: self.cached_haskey(key),
+                    lambda key: self.cached_has_key(key),
                     word_list
                 )
             )
             if len(word_list) <= 50:
-                sorted_word_list = list(
+                word_list = list(
                     sorted(
-                        filtered_word_list, 
+                        word_list, 
                         key=sort_defined_words       
                     )
                 )
-                return sorted_word_list[0:20]
-            empty_word_list = []
-            return empty_word_list
-        return word_list
+                return word_list
+        empty_word_list = []
+        return empty_word_list
 
