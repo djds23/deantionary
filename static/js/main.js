@@ -3,10 +3,10 @@ React.initializeTouchEvents(true);
 var InputForm = React.createClass({displayName: "InputForm",
     handleSubmit: function (e) {
         e.preventDefault();
-        this.props.onWordSubmit(
-            React.findDOMNode(this.refs.text).value.trim()
-        );
+        var wordVal = React.findDOMNode(this.refs.text).value.trim();
+        this.props.onWordSubmit(wordVal);
         e.stopPropagation();
+        window.location.hash = '#' + wordVal; 
         return;
     },
     render: function () {
