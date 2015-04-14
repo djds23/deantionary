@@ -15,3 +15,5 @@ TODO: Allow users to propose and approve words
 TODO: render all react templates server-side, lag is already starting to get noticable
 
 TODO: move from loading the whole JSON in memory to redis 
+
+TODO: Integrate circle ci or some other ci platform to make deploys easier
