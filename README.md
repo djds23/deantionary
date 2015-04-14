@@ -9,6 +9,9 @@ Details about the SpellChecker can be found in this article:
 http://norvig.com/spell-correct.html 
 
 TODO: Add pagination and autoscrolling for suggested words of over 10 words
+
 TODO: Allow users to propose and approve words
+
 TODO: render all react templates server-side, lag is already starting to get noticable
+
 TODO: move from loading the whole JSON in memory to redis 
