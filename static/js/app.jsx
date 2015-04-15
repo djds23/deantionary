@@ -1,12 +1,7 @@
 import React from 'react';
 import $ from 'jquery';
-// Bootstrap demands this to work with ES6 modules
-window.$ = $;
-window.jQuery = $;
 
 React.initializeTouchEvents(true);
-
-var poop = '';
 
 var InputForm = React.createClass({
     handleSubmit: function (e) {
@@ -39,7 +34,7 @@ var WordDefinition = React.createClass({
     render: function () {
         return (
                 <div>
-                    <a data-togglr="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + this.props.LookUpObject.word}>
+                    <a href={$SCRIPT_ROOT + '/#' + this.props.LookUpObject.word}>
                         <h5>
                             {this.props.LookUpObject.word}
                         </h5>
@@ -56,10 +51,6 @@ var DefinitionBox = React.createClass({
     takeSuggestion: function (e) {
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
-    },
-    componentDidMount: function () {
-        //$('[data-toggle="tooltip"]').tooltip();
-        return;
     },
     render: function () {
         if (this.props.data.definition !== null) {
