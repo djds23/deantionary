@@ -1,3 +1,6 @@
+import React from 'react';
+import $ from 'jquery';
+
 React.initializeTouchEvents(true);
 
 var InputForm = React.createClass({
@@ -31,7 +34,7 @@ var WordDefinition = React.createClass({
     render: function () {
         return (
                 <div>
-                    <a data-togglr="tooltip" data-placement="top" title="Copy Link" href={$SCRIPT_ROOT + '/#' + this.props.LookUpObject.word}>
+                    <a href={$SCRIPT_ROOT + '/#' + this.props.LookUpObject.word}>
                         <h5>
                             {this.props.LookUpObject.word}
                         </h5>
@@ -48,9 +51,6 @@ var DefinitionBox = React.createClass({
     takeSuggestion: function (e) {
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
-    },
-    componentDidMount: function () {
-        $('[data-toggle="tooltip"]').tooltip();
     },
     render: function () {
         if (this.props.data.definition !== null) {
