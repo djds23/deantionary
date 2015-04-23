@@ -68,7 +68,6 @@ class LookUp(BaseLookUp):
 
 
 class Webster(object):
-    # ensure words are lowercase
     english = {k.lower(): v for k, v in data.items()}
     _keys = list(english.keys()) 
 
