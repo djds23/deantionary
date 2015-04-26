@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 React.initializeTouchEvents(true);
 
-class InputForm extends React.Component {
+export class InputForm extends React.Component {
     handleSubmit (e) {
         e.preventDefault();
         const wordVal = React.findDOMNode(this.refs.text).value.trim();
@@ -32,7 +32,7 @@ class InputForm extends React.Component {
     }
 }
 
-class WordDefinition extends React.Component {
+export class WordDefinition extends React.Component {
     render () {
         return (
                 <div>
@@ -49,7 +49,7 @@ class WordDefinition extends React.Component {
     }
 }
 
-class DefinitionBox extends React.Component {
+export class DefinitionBox extends React.Component {
     takeSuggestion (e) {
         e.preventDefault();
         this.props.wordLookup(e.currentTarget.innerText);
@@ -86,8 +86,7 @@ class DefinitionBox extends React.Component {
     }
 }
 
-
-class DictionaryBox extends React.Component {
+export class DictionaryBox extends React.Component {
     handleWordLookUp (word) {
         $.get(this.props.url + word).done(data => {
             this.setState({
@@ -130,3 +129,4 @@ React.render(
     <DictionaryBox url={$SCRIPT_ROOT + '/define/'} />,
     document.getElementById('content')
 );
+
