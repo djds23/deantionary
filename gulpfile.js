@@ -20,9 +20,14 @@ gulp.task('javascript', function () {
   b.transform(babelify);
   b = watchify(b);
   b.on('update', bundle);
+  b.on('log', gutil.log);
 
   function bundle () { 
     return b.bundle()
+      .on('error', function (error) {
+        gutil.log(error.message);
+        this.emit('end');
+      })
       .pipe(source('main.js'))
       .pipe(buffer())
       .pipe(sourcemaps.init({loadMaps: true}))
