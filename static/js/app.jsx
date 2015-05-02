@@ -2,6 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 
 
+const $SCRIPT_ROOT = window.$SCRIPT_ROOT || '';
 React.initializeTouchEvents(true);
 
 export class InputForm extends React.Component {

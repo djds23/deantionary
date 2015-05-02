@@ -1,5 +1,6 @@
 import React from 'react/addons';
-import {WordDefinition} from '../app';
+import {WordDefinition} from '../app.jsx';
+
 
 const TestUtils = React.addons.TestUtils;
 const FakeLookUp = {

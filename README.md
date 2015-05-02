@@ -17,3 +17,9 @@ TODO: render all react templates server-side, lag is already starting to get not
 TODO: move from loading the whole JSON in memory to redis 
 
 TODO: Integrate circle ci or some other ci platform to make deploys easier
+
+To build ES6, you must install iojs & babel.
+
+Personally, I use gulp as my built tool. 
+
+Run `npm install` && `gulp` to build any alterations to the js. The gulpfile is configured with watchify & browserify, so it will compile any alterations as you type.
