@@ -7,6 +7,8 @@ from functools import lru_cache
 from itertools import chain
 
 
+__all__ = ['SpellChecker', 'LookUp', 'Webster'] 
+
 with open('dictionary.json', 'r') as f:
     data = f.read()
     data = json.loads(data)
