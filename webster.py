@@ -1,15 +1,8 @@
 import collections
-import json
-import random
 import string
-from collections.abc import Iterator, Mapping
 from functools import lru_cache
 from itertools import chain
 
-
-with open('dictionary.json', 'r') as f:
-    data = f.read()
-    data = json.loads(data)
 
 class SpellChecker(object):
 
@@ -33,12 +26,12 @@ class SpellChecker(object):
 
     def correct(self, word):
         candidates = (self._known([word]) or self._known(self._check1(word))
-                or self._known_edits2(word) or [word])
+                      or self._known_edits2(word) or [word])
         return max(candidates, key=self.model.get)
     
     def possible_corrections(self, word):
         candidates = (self._known([word]) or self._known(self._check1(word))
-                or self._known_edits2(word) or [word])
+                      or self._known_edits2(word) or [word])
         words = []
         while candidates:
             possible_word = max(candidates, key=self.model.get)
@@ -47,38 +40,18 @@ class SpellChecker(object):
         return words
 
 
-BaseLookUp = collections.namedtuple('LookUp', [
-    'word',
-    'definition',
-    'suggestions'
-])
-
-class LookUp(BaseLookUp):
-    """ currently not working, for some reason subclassing BaseLookUp breaks 
-    `._asdict`
-    """
-    def serialize(self, return_dict=None):
-        from utils import serialize_namedtuple
-        return serialize_namedtuple(self) 
-
-    def _asdict(self):
-        """Need to reimplement this for subclasses of namedtuple objects"""
-        # TODO: investigate this or file bug in Python3
-        return dict(zip(self._fields, self))
-
-
 class Webster(object):
-    english = {k.lower(): v for k, v in data.items()}
-    _keys = list(english.keys()) 
 
-    def __init__(self):
-        raw_definitions =[ 
-            word.strip('.').lower() for definition in self.english.values() 
+    def __init__(self, words_and_definitions):
+        self.word_dict = {k.lower(): v for k, v in words_and_definitions.items()}
+        self._keys = list(self.word_dict.keys())
+        raw_definitions = [
+            word.strip('.').lower() for definition in self.word_dict.values()
             for word in definition.split() 
         ] 
         spell_checker = SpellChecker(
             chain(
-                data.keys(), 
+                words_and_definitions.keys(),
                 raw_definitions
             )
         ) 
@@ -86,25 +59,25 @@ class Webster(object):
     
     @lru_cache(maxsize=128)
     def cached_get(self, word):
-        return self.english.get(word)
+        return self.word_dict.get(word)
 
     @lru_cache(maxsize=128)
     def cached_has_key(self, word):
-        return word in self.english.keys()
+        return word in self.word_dict.keys()
 
     @lru_cache()
     def define(self, word):
         word = word.lower()
         definition = self.cached_get(word)
         if definition:
-            return LookUp(
+            return dict(
                 word=word.capitalize(), 
                 definition=definition, 
                 suggestions=None
             )
 
-        suggestions=self.find_similar(word)
-        return LookUp(
+        suggestions = self.find_similar(word)
+        return dict(
             word=word.capitalize(), 
             definition=None, 
             suggestions=suggestions
@@ -116,7 +89,7 @@ class Webster(object):
         for word in possible_similarities:
             definition = self.cached_get(word)
             if definition:
-                word_list.append(LookUp(
+                word_list.append(dict(
                     word=word.capitalize(),
                     definition=definition,
                     suggestions=[]
@@ -126,7 +99,7 @@ class Webster(object):
         for word in self.find_same_startswith(word):
             definition = self.cached_get(word)
             if definition:
-                word_list.append(LookUp(
+                word_list.append(dict(
                     word=word.capitalize(),
                     definition=definition,
                     suggestions=[]
